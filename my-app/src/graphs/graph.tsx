@@ -1,7 +1,5 @@
-import React from 'react';
-import { Vega } from 'react-vega';
-import { VisualizationSpec } from 'vega-embed';
-
+import React, { useEffect, useRef } from 'react';
+import embed, { type VisualizationSpec } from 'vega-embed';
 
 const spec: VisualizationSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
@@ -33,13 +31,25 @@ const spec: VisualizationSpec = {
 };
 
 const BarChart: React.FC = () => {
+    // 1. Create a reference to the DOM element
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // 2. Embed the chart when the component mounts
+        if (containerRef.current) {
+            embed(containerRef.current, spec).catch((err) => {
+                console.error("Vega Embed Error:", err);
+            });
+        }
+    }, []);
+
     return (
         <div>
             <h1>Vega-Lite Test Graph</h1>
-            <Vega spec={spec} actions={true} />
+            {/* 3. The div where Vega will inject the graph */}
+            <div ref={containerRef} style={{ width: '100%' }} />
         </div>
     );
 };
-
 
 export default BarChart;
